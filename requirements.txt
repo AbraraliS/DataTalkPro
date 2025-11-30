@@ -1,0 +1,11 @@
+langchain
+langchain-core
+langchain-community
+streamlit
+langchain-google-genai
+mysql-connector-python
+dotenv
+python-dotenv
+pymysql    
+sqlalchemy 
+pandas
