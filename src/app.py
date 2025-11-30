@@ -92,6 +92,9 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list):
     })
 
 
+<<<<<<< HEAD
+st.set_page_config("DataTalk Pro", page_icon='💬')
+=======
 # Page configuration
 st.set_page_config(
     page_title="DataTalk Pro",
@@ -274,15 +277,24 @@ st.markdown("""
         <p>Intelligent Database Conversations Powered by AI</p>
     </div>
 """, unsafe_allow_html=True)
+>>>>>>> b80ae19f4f0f622af18fa2c89369ae5ca1937683
 
 if 'chat_history' not in st.session_state:
     st.session_state['chat_history'] = [
-        AIMessage(content="Hello! I'm here to help you, Ask me anything about your data or structure.")
+        AIMessage(content="Hello! I'm DataTalk Pro. Ask me anything about your data or database structure.")
     ]
+
+<<<<<<< HEAD
+st.title("💬 DataTalk Pro")
 
 
 with st.sidebar:
+    st.header("💬 DataTalk Pro")
+=======
+
+with st.sidebar:
     st.markdown("### 🔌 Database Connection")
+>>>>>>> b80ae19f4f0f622af18fa2c89369ae5ca1937683
     st.markdown("---")
 
     host = st.text_input("Host", value="sql8.freesqldatabase.com", key='host')
