@@ -7,6 +7,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
 import pymysql
+from sql_guard import REFUSAL, UnsafeQueryError, check_read_only
 pymysql.install_as_MySQLdb()
 
 load_dotenv()
@@ -68,18 +69,26 @@ def get_response(user_query: str, db: SQLDatabase, chat_history: list):
     NOTE : along with the answer provide table format if it is possible.
     Remember to follow these guidelines:
     1. If user do not specify any table name then assume the table name is 'emp'
-   
-    Dangerous Operations:
-    - If the SQL query contains any dangerous operations like DELETE, DROP, UPDATE, or ALTER, do not execute the query. Instead, respond with "I'm sorry, but I cannot execute queries that modify or delete data."
     """
 
     prompt = ChatPromptTemplate.from_template(template)
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite")      
 
+    # Check the generated SQL in code before anything reaches the database.
+    query = sql_chain.invoke({
+        "chat_history": chat_history,
+        "question": user_query
+    })
+    try:
+        safe_query = check_read_only(query)
+    except UnsafeQueryError:
+        return REFUSAL
+
     chain = (
-        RunnablePassthrough.assign(query=sql_chain).assign(
+        RunnablePassthrough.assign(
+            query=lambda _: safe_query,
             schema=lambda _: db.get_table_info(),
-            response=lambda vars: db.run(vars['query'])
+            response=lambda _: db.run(safe_query)
         )
         | prompt
         | llm
